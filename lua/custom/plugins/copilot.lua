@@ -1,5 +1,5 @@
 return {
-  {
+  --[[ {
     'zbirenbaum/copilot.lua',
     cmd = 'Copilot',
     build = ':Copilot auth',
@@ -10,8 +10,6 @@ return {
           enabled = true,
           auto_refresh = true,
           keymap = {
-            jump_next = '<c-j>',
-            jump_prev = '<c-k>',
             accept = '<Tab>',
             refresh = 'r',
             open = '<M-CR>',
@@ -36,5 +34,5 @@ return {
         },
       }
     end,
-  },
+  }, ]]
 }

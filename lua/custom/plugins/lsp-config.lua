@@ -133,7 +133,7 @@ return {
 
         map('<leader>ca', vim.lsp.buf.code_action, 'Code Action')
         map('<leader>cs', vim.lsp.buf.signature_help, 'Display Signature Information')
-        map('<leader>ra', vim.lsp.buf.rename, 'Rename all references')
+        --[[         map('<leader>ra', vim.lsp.buf.rename, 'Rename all references') ]]
         map('<leader>cf', vim.lsp.buf.format, 'Format')
         map('<leader>ci', function()
           require('snacks').picker.lsp_implementations()
@@ -147,10 +147,15 @@ return {
       end,
     })
 
-    local signs = { Error = ' ', Warn = ' ', Hint = '󰠠 ', Info = ' ' }
-    for type, icon in pairs(signs) do
-      local hl = 'DiagnosticSign' .. type
-      vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = '' })
-    end
+    vim.diagnostic.config {
+      signs = {
+        text = {
+          [vim.diagnostic.severity.ERROR] = ' ',
+          [vim.diagnostic.severity.WARN] = ' ',
+          [vim.diagnostic.severity.HINT] = '󰠠 ',
+          [vim.diagnostic.severity.INFO] = ' ',
+        },
+      },
+    }
   end,
 }
