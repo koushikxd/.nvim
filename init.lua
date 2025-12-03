@@ -104,6 +104,11 @@ vim.keymap.set('n', '<leader>rc', function()
   require('utils').remove_comments()
 end, { desc = '[R]emove [C]omments' })
 
+vim.keymap.set('v', '<leader>ay', function()
+  local utils = require 'utils'
+  utils.yank_visual_with_path(utils.get_buffer_absolute(), 'absolute')
+end, { desc = '[A]bsolute path [Y]ank with selection' })
+
 vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
 vim.keymap.set('v', 'J', ":m '>+1<CR>gv=gv")
