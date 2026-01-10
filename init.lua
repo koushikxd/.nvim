@@ -52,9 +52,17 @@ vim.opt.scrolloff = 10
 vim.opt.guicursor = ''
 
 vim.diagnostic.config {
-  signs = { priority = 9999 },
+  signs = {
+    priority = 9999,
+    text = {
+      [vim.diagnostic.severity.ERROR] = ' ',
+      [vim.diagnostic.severity.WARN] = ' ',
+      [vim.diagnostic.severity.HINT] = '󰠠 ',
+      [vim.diagnostic.severity.INFO] = ' ',
+    },
+  },
   underline = true,
-  update_in_insert = false, -- false so diags are updated on InsertLeave
+  update_in_insert = false,
   virtual_text = { current_line = true, severity = { min = 'INFO', max = 'WARN' } },
   virtual_lines = { current_line = true, severity = { min = 'ERROR' } },
   severity_sort = true,
@@ -188,14 +196,6 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
   end
 end
 vim.opt.rtp:prepend(lazypath)
-local format_group = vim.api.nvim_create_augroup('FormatAutogroup', { clear = true })
-
-vim.api.nvim_create_autocmd('BufWritePre', {
-  group = format_group,
-  callback = function()
-    vim.lsp.buf.format()
-  end,
-})
 
 require('lazy').setup({
   'tpope/vim-sleuth',
@@ -216,15 +216,15 @@ require('lazy').setup({
     config = function()
       local npairs = require 'nvim-autopairs'
       npairs.setup {
-        disable_in_macro = true, -- disable when recording or executing a macro
-        disable_in_visualblock = true, -- disable when insert after visual block mode
-        ignored_next_char = '[%w%.%)]', -- don't add pair if next char is alphanumeric
+        disable_in_macro = true,
+        disable_in_visualblock = true,
+        ignored_next_char = '[%w%.%)]',
         enable_moveright = true,
-        enable_afterquote = false, -- don't add pair after quote
-        enable_check_bracket_line = true, -- check bracket in same line
-        map_bs = false, -- don't map the <BS> key
-        map_c_h = false, -- don't map the <C-h> key
-        map_c_w = false, -- don't map <C-w> key
+        enable_afterquote = false,
+        enable_check_bracket_line = true,
+        map_bs = false,
+        map_c_h = false,
+        map_c_w = false,
       }
     end,
   },
@@ -311,6 +311,7 @@ require('lazy').setup({
       require('mini.surround').setup()
     end,
   },
+  { 'NMAC427/guess-indent.nvim', opts = {} },
   {
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
@@ -339,6 +340,52 @@ require('lazy').setup({
       },
       indent = { enable = true, disable = { 'ruby' } },
     },
+  },
+  {
+    'nvim-treesitter/nvim-treesitter-textobjects',
+    branch = 'main',
+    event = 'VeryLazy',
+    config = function()
+      require('nvim-treesitter-textobjects').setup {
+        select = { lookahead = true },
+        move = { set_jumps = true },
+      }
+
+      local select = require 'nvim-treesitter-textobjects.select'
+      local move = require 'nvim-treesitter-textobjects.move'
+
+      vim.keymap.set({ 'x', 'o' }, 'af', function()
+        select.select_textobject('@function.outer', 'textobjects')
+      end)
+      vim.keymap.set({ 'x', 'o' }, 'if', function()
+        select.select_textobject('@function.inner', 'textobjects')
+      end)
+      vim.keymap.set({ 'x', 'o' }, 'ac', function()
+        select.select_textobject('@class.outer', 'textobjects')
+      end)
+      vim.keymap.set({ 'x', 'o' }, 'ic', function()
+        select.select_textobject('@class.inner', 'textobjects')
+      end)
+      vim.keymap.set({ 'x', 'o' }, 'aa', function()
+        select.select_textobject('@parameter.outer', 'textobjects')
+      end)
+      vim.keymap.set({ 'x', 'o' }, 'ia', function()
+        select.select_textobject('@parameter.inner', 'textobjects')
+      end)
+
+      vim.keymap.set({ 'n', 'x', 'o' }, '[f', function()
+        move.goto_next_start('@function.outer', 'textobjects')
+      end)
+      vim.keymap.set({ 'n', 'x', 'o' }, ']f', function()
+        move.goto_previous_start('@function.outer', 'textobjects')
+      end)
+      vim.keymap.set({ 'n', 'x', 'o' }, '[a', function()
+        move.goto_next_start('@parameter.inner', 'textobjects')
+      end)
+      vim.keymap.set({ 'n', 'x', 'o' }, ']a', function()
+        move.goto_previous_start('@parameter.inner', 'textobjects')
+      end)
+    end,
   },
 
   { import = 'default.plugins' },

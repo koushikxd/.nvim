@@ -14,10 +14,7 @@ return {
         colors = {
           theme = {
             all = {
-              ui = {
-                --[[ bg = '#080808',
-                bg_gutter = '#080808', ]]
-              },
+              ui = {},
             },
           },
         },
@@ -42,7 +39,7 @@ return {
           }
         end,
       }
-      vim.cmd.colorscheme 'kanagawa'
+      -- vim.cmd.colorscheme 'kanagawa'
 
       vim.api.nvim_set_hl(0, 'Normal', { bg = 'NONE' })
       vim.api.nvim_set_hl(0, 'NormalFloat', { bg = 'NONE' })
@@ -73,7 +70,6 @@ return {
           },
         },
       }
-      --vim.cmd.colorscheme 'rose-pine'
     end,
   },
   {
@@ -93,10 +89,27 @@ return {
     end,
   },
   {
+    'oskarnurm/koda.nvim',
+    lazy = false,
+    priority = 1000,
+    config = function()
+      vim.cmd.colorscheme 'koda'
+    end,
+  },
+  {
+    'datsfilipe/vesper.nvim',
+    priority = 1000,
+    config = function()
+      -- vim.cmd.colorscheme 'vesper'
+    end,
+  },
+  {
     'ficcdaf/ashen.nvim',
     name = 'ashen',
     priority = 1000,
-    config = function() end,
+    config = function()
+      -- vim.cmd.colorscheme 'ashen'
+    end,
   },
   {
     'wtfox/jellybeans.nvim',
@@ -120,9 +133,7 @@ return {
     name = 'moonfly',
     lazy = false,
     priority = 1000,
-    config = function()
-      --vim.cmd 'colorscheme moonfly'
-    end,
+    config = function() end,
   },
   {
     'catppuccin/nvim',
@@ -478,13 +489,12 @@ return {
           mocha = function(colors)
             return {
               BookmarkHighlight = {
-                bg = colors.bookmark0, -- pick a contrasting color
-                -- blend = 50,
+                bg = colors.bookmark0,
                 underline = false,
                 bold = true,
               },
               BookmarkSignHighlight = {
-                fg = colors.yellow, -- Use blue from your theme
+                fg = colors.yellow,
                 bold = true,
                 default = true,
               },
@@ -492,8 +502,6 @@ return {
           end,
         },
       }
-
-      --vim.api.nvim_command 'colorscheme catppuccin'
     end,
   },
 }

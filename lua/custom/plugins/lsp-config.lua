@@ -4,8 +4,8 @@ return {
   dependencies = {
     { 'williamboman/mason.nvim' },
     'williamboman/mason-lspconfig.nvim',
-    { 'j-hui/fidget.nvim', opts = {} },
     { 'b0o/schemastore.nvim' },
+    { 'folke/lazydev.nvim', ft = 'lua', opts = { library = { { path = '${3rd}/luv/library', words = { 'vim%.uv' } } } } },
   },
   config = function()
     local servers = {
@@ -32,17 +32,7 @@ return {
     vim.lsp.config('lua_ls', {
       settings = {
         Lua = {
-          runtime = { version = 'LuaJIT' },
-          workspace = {
-            checkThirdParty = false,
-            library = {
-              '${3rd}/luv/library',
-              unpack(vim.api.nvim_get_runtime_file('', true)),
-            },
-          },
-          completion = {
-            callSnippet = 'Replace',
-          },
+          completion = { callSnippet = 'Replace' },
         },
       },
     })
@@ -144,18 +134,14 @@ return {
         map('<leader>Wl', function()
           print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
         end, 'Workspace List Folders')
+
+        local client = vim.lsp.get_client_by_id(event.data.client_id)
+        if client and client:supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
+          map('<leader>th', function()
+            vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf })
+          end, 'Toggle Inlay Hints')
+        end
       end,
     })
-
-    vim.diagnostic.config {
-      signs = {
-        text = {
-          [vim.diagnostic.severity.ERROR] = ' ',
-          [vim.diagnostic.severity.WARN] = ' ',
-          [vim.diagnostic.severity.HINT] = '󰠠 ',
-          [vim.diagnostic.severity.INFO] = ' ',
-        },
-      },
-    }
   end,
 }

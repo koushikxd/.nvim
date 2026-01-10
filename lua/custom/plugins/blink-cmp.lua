@@ -1,15 +1,5 @@
 return {
   {
-    'L3MON4D3/LuaSnip',
-    build = 'make install_jsregexp',
-    dependencies = {
-      'rafamadriz/friendly-snippets',
-    },
-    config = function()
-      require('luasnip.loaders.from_vscode').lazy_load()
-    end,
-  },
-  {
     'saghen/blink.cmp',
     dependencies = {
       'rafamadriz/friendly-snippets',
@@ -62,8 +52,12 @@ return {
         },
       },
       sources = {
-        default = { 'lsp', 'path', 'snippets', 'buffer' },
+        default = { 'lsp', 'path', 'snippets', 'buffer', 'lazydev' },
+        providers = {
+          lazydev = { module = 'lazydev.integrations.blink', score_offset = 100 },
+        },
       },
+      fuzzy = { implementation = 'prefer_rust' },
       completion = {
         accept = {
           auto_brackets = {
@@ -100,28 +94,5 @@ return {
       },
     },
     opts_extend = { 'sources.default' },
-    config = function(_, opts)
-      -- Set up blink.cmp
-      require('blink.cmp').setup(opts)
-
-      -- Configure highlight groups to match dark theme
-      local function setup_blink_highlights()
-        -- Use colors that match most dark themes
-        vim.api.nvim_set_hl(0, 'BlinkCmpMenu', { bg = '#181825', fg = '#cdd6f4' })
-        vim.api.nvim_set_hl(0, 'BlinkCmpMenuBorder', { fg = '#585b70' })
-        vim.api.nvim_set_hl(0, 'BlinkCmpMenuSelection', { bg = '#313244', fg = '#cdd6f4' })
-        vim.api.nvim_set_hl(0, 'BlinkCmpDoc', { bg = '#181825', fg = '#cdd6f4' })
-        vim.api.nvim_set_hl(0, 'BlinkCmpDocBorder', { fg = '#585b70' })
-      end
-
-      -- Set highlights immediately
-      setup_blink_highlights()
-
-      -- Update highlights when colorscheme changes
-      vim.api.nvim_create_autocmd('ColorScheme', {
-        group = vim.api.nvim_create_augroup('BlinkCmpTheme', { clear = true }),
-        callback = setup_blink_highlights,
-      })
-    end,
   },
 }

@@ -5,13 +5,11 @@ return {
       theme = {
         normal = {
           a = { bg = '#BD93F9', fg = '#282A36' },
-
           b = { bg = '#2B2B2B', fg = '#F8F8F2' },
           c = { bg = '#303030', fg = '#F8F8F2' },
         },
         insert = {
           a = { bg = '#FFB86C', fg = '#282A36' },
-
           b = { bg = '#2B2B2B', fg = '#F8F8F2' },
           c = { bg = '#303030', fg = '#F8F8F2' },
         },
@@ -87,12 +85,20 @@ return {
       {
         filetypes = { 'CompetiTest' },
         sections = {
-          lualine_b = { vim.b.competitest_title or 'CompetiTest' },
+          lualine_b = {
+            function()
+              return vim.b.competitest_title or 'CompetiTest'
+            end,
+          },
           lualine_y = { 'searchcount' },
           lualine_z = { 'change this sometime' },
         },
         inactive_sections = {
-          lualine_b = { vim.b.competitest_title or 'CompetiTest' },
+          lualine_b = {
+            function()
+              return vim.b.competitest_title or 'CompetiTest'
+            end,
+          },
         },
       },
     },
