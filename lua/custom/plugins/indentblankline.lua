@@ -4,19 +4,23 @@ return {
     main = 'ibl',
     opts = {
       indent = {
-        highlight = 'IndentLine',
         char = '│',
       },
       scope = {
         enabled = true,
-        highlight = 'IndentLineActive',
         show_start = false,
         show_end = false,
       },
     },
     config = function(_, opts)
-      vim.api.nvim_set_hl(0, 'IndentLine', { fg = '#2C2C2C' })
-      vim.api.nvim_set_hl(0, 'IndentLineActive', { fg = '#707070' })
+      local function set_hl()
+        vim.api.nvim_set_hl(0, 'IblIndent', { fg = '#2C2C2C' })
+        vim.api.nvim_set_hl(0, 'IblScope', { fg = '#707070' })
+      end
+      set_hl()
+      vim.api.nvim_create_autocmd('ColorScheme', {
+        callback = set_hl,
+      })
       require('ibl').setup(opts)
     end,
   },

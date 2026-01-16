@@ -202,6 +202,20 @@ require('lazy').setup({
   'ThePrimeagen/vim-be-good',
   'vuciv/golf',
   {
+    'enochchau/nvim-pretty-ts-errors',
+    build = 'npm install',
+    ft = { 'typescript', 'typescriptreact', 'javascript', 'javascriptreact' },
+    keys = {
+      {
+        '<C-w>d',
+        function()
+          require('nvim-pretty-ts-errors').show_line_diagnostics()
+        end,
+        desc = 'Show TS Diagnostics',
+      },
+    },
+  },
+  {
     'karb94/neoscroll.nvim',
     config = function()
       require('neoscroll').setup {
@@ -326,6 +340,7 @@ require('lazy').setup({
         'html',
         'lua',
         'markdown',
+        'markdown_inline',
         'vim',
         'typescript',
         'tsx',

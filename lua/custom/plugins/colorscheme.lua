@@ -93,7 +93,7 @@ return {
     lazy = false,
     priority = 1000,
     config = function()
-      vim.cmd.colorscheme 'koda'
+      --vim.cmd.colorscheme 'koda'
     end,
   },
   {
@@ -101,6 +101,12 @@ return {
     priority = 1000,
     config = function()
       -- vim.cmd.colorscheme 'vesper'
+    end,
+  },
+  {
+    'GasimGasimzada/intent.nvim',
+    config = function()
+      vim.cmd.colorscheme 'intent'
     end,
   },
   {
