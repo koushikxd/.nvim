@@ -267,7 +267,7 @@ require('lazy').setup({
       }
     end,
   },
-  {
+  --[[ {
     'yetone/avante.nvim',
     event = 'VeryLazy',
     lazy = false,
@@ -312,7 +312,7 @@ require('lazy').setup({
       },
     },
   },
-
+]]
   { 'tzachar/highlight-undo.nvim' },
 
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
