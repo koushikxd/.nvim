@@ -4,24 +4,42 @@ return {
   version = '*',
   dependencies = {
     'SmiteshP/nvim-navic',
-    'nvim-tree/nvim-web-devicons', -- optional dependency
+    'nvim-tree/nvim-web-devicons',
   },
   opts = {
-    -- configurations go here
+    attach_navic = false,
   },
   config = function()
+    local navic = require 'nvim-navic'
+
     require('barbecue').setup {
-      create_autocmd = false, -- prevent barbecue from updating itself automatically
+      create_autocmd = false,
+      attach_navic = false,
     }
 
+    vim.api.nvim_create_autocmd('LspAttach', {
+      group = vim.api.nvim_create_augroup('navic_attach', { clear = true }),
+      callback = function(args)
+        local client = vim.lsp.get_client_by_id(args.data.client_id)
+        local buf = args.buf
+        if vim.b[buf].navic_attached then
+          return
+        end
+        if client and client.name == 'graphql' then
+          return
+        end
+        if client and client.server_capabilities.documentSymbolProvider then
+          navic.attach(client, buf)
+          vim.b[buf].navic_attached = true
+        end
+      end,
+    })
+
     vim.api.nvim_create_autocmd({
-      'WinScrolled', -- or WinResized on NVIM-v0.9 and higher
+      'WinScrolled',
       'BufWinEnter',
       'CursorHold',
       'InsertLeave',
-
-      -- include this if you have set `show_modified` to `true`
-      -- "BufModifiedSet",
     }, {
       group = vim.api.nvim_create_augroup('barbecue.updater', {}),
       callback = function()
