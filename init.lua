@@ -7,7 +7,6 @@ vim.g.have_nerd_font = true
 vim.opt.number = true
 vim.opt.nu = true
 vim.opt.updatetime = 50
-vim.opt.colorcolumn = '100'
 vim.opt.relativenumber = true
 vim.opt.tabstop = 2
 vim.opt.softtabstop = 2
@@ -241,6 +240,11 @@ require('lazy').setup({
         map_c_w = false,
       }
     end,
+  },
+  {
+    'nemanjamalesija/smart-paste.nvim',
+    event = 'VeryLazy',
+    config = true,
   },
   {
     'numToStr/Comment.nvim',

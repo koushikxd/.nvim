@@ -39,7 +39,7 @@ return {
           }
         end,
       }
-      -- vim.cmd.colorscheme 'kanagawa'
+      vim.cmd.colorscheme 'kanagawa'
 
       vim.api.nvim_set_hl(0, 'Normal', { bg = 'NONE' })
       vim.api.nvim_set_hl(0, 'NormalFloat', { bg = 'NONE' })
@@ -106,7 +106,7 @@ return {
   {
     'GasimGasimzada/intent.nvim',
     config = function()
-      vim.cmd.colorscheme 'intent'
+      --[[       vim.cmd.colorscheme 'intent' ]]
     end,
   },
   {
