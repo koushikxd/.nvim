@@ -4,6 +4,7 @@ return {
     vim.keymap.set('n', '<leader>g-', vim.cmd.Git)
 
     local BlitZ_Fugitive = vim.api.nvim_create_augroup('BlitZ_Fugitive', {})
+    local BlitZ_Diff = vim.api.nvim_create_augroup('BlitZ_Diff', {})
 
     local autocmd = vim.api.nvim_create_autocmd
     autocmd('BufWinEnter', {
@@ -31,7 +32,18 @@ return {
       end,
     })
 
-    vim.keymap.set('n', 'gu', '<cmd>diffget //2<CR>')
-    vim.keymap.set('n', 'gh', '<cmd>diffget //3<CR>')
+    autocmd('BufWinEnter', {
+      group = BlitZ_Diff,
+      pattern = '*',
+      callback = function(args)
+        if not vim.wo.diff then
+          return
+        end
+
+        local opts = { buffer = args.buf, remap = false, silent = true }
+        vim.keymap.set('n', 'gu', '<cmd>diffget //2<CR>', opts)
+        vim.keymap.set('n', 'gh', '<cmd>diffget //3<CR>', opts)
+      end,
+    })
   end,
 }

@@ -1,5 +1,7 @@
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
 
 vim.g.autoformat = false
 vim.g.have_nerd_font = true
@@ -80,7 +82,6 @@ vim.keymap.set('n', 'zh', '8zh')
 vim.keymap.set('n', 'zl', '8zl')
 vim.keymap.set('n', 'n', 'nzzzv')
 vim.keymap.set('n', 'N', 'Nzzzv')
-vim.keymap.set('n', '<leader>pv', vim.cmd.Ex)
 vim.keymap.set('x', '<leader>p', [["_dP]])
 vim.keymap.set({ 'n', 'v' }, '<leader>y', [["+y]])
 vim.keymap.set('n', '<leader>Y', [["+Y]])
@@ -241,11 +242,11 @@ require('lazy').setup({
       }
     end,
   },
-  {
+  --[[ {
     'nemanjamalesija/smart-paste.nvim',
     event = 'VeryLazy',
     config = true,
-  },
+  }, ]]
   {
     'numToStr/Comment.nvim',
     event = 'VeryLazy',

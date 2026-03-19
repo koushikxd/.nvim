@@ -1,7 +1,18 @@
 return {
   'stevearc/oil.nvim',
+  lazy = false,
   opts = {
-    default_file_explorer = false,
+    default_file_explorer = true,
+    keymaps = {
+      ['<leader><tab>'] = {
+        callback = function()
+          require('custom.picker').files()
+        end,
+        desc = 'Find Files',
+        mode = 'n',
+      },
+      ['<C-p>'] = false,
+    },
     view_options = {
       show_hidden = true,
     },
@@ -10,6 +21,6 @@ return {
   dependencies = { 'nvim-tree/nvim-web-devicons' },
   keys = {
     { '-', '<CMD>Oil<CR>', desc = 'Open parent directory' },
-    { '<leader>pv', vim.cmd.Ex, desc = 'Open Netrw' },
+    { '<leader>pv', '<CMD>Oil<CR>', desc = 'Open Oil' },
   },
 }

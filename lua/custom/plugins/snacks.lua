@@ -13,7 +13,7 @@ return {
       },
     },
     bigfile = { enabled = true },
-    statuscolumn = { enabled = true },
+    statuscolumn = { enabled = false },
     quickfile = { enabled = false },
     image = {
       enabled = true,
@@ -24,8 +24,21 @@ return {
       },
     },
     picker = {
+      enabled = true,
       debug = {
         scores = true,
+      },
+      hidden = true,
+      sources = {
+        files = {
+          hidden = false,
+          ignored = true,
+          exclude = {
+            '.git',
+            '.agents',
+            'node_modules',
+          },
+        },
       },
       layout = {
         preset = 'ivy',
@@ -46,7 +59,7 @@ return {
             { win = 'input', height = 1, border = 'bottom' },
             {
               box = 'horizontal',
-              { win = 'list',    border = 'none' },
+              { win = 'list', border = 'none' },
               { win = 'preview', title = '{preview}', width = 0.5, border = 'left' },
             },
           },
@@ -62,9 +75,9 @@ return {
             border = 'rounded',
             title = '{title} {live} {flags}',
             title_pos = 'center',
-            { win = 'input',   height = 1,          border = 'bottom' },
-            { win = 'list',    border = 'none' },
-            { win = 'preview', title = '{preview}', height = 0.4,     border = 'top' },
+            { win = 'input', height = 1, border = 'bottom' },
+            { win = 'list', border = 'none' },
+            { win = 'preview', title = '{preview}', height = 0.4, border = 'top' },
           },
         },
       },
@@ -74,6 +87,10 @@ return {
       win = {
         input = {
           keys = {
+            ['<Tab>'] = false,
+            ['<S-Tab>'] = false,
+            ['<C-p>'] = false,
+            ['<C-n>'] = false,
 
             ['<Esc>'] = { 'close', mode = { 'n', 'i' } },
 
@@ -83,6 +100,14 @@ return {
             ['L'] = { 'preview_scroll_right', mode = { 'i', 'n' } },
           },
         },
+        list = {
+          keys = {
+            ['<Tab>'] = false,
+            ['<S-Tab>'] = false,
+            ['<C-p>'] = false,
+            ['<C-n>'] = false,
+          },
+        },
       },
     },
   },
@@ -90,13 +115,6 @@ return {
     _G.Snacks = require 'snacks'
   end,
   keys = {
-    {
-      '<leader>se',
-      function()
-        require('snacks').explorer()
-      end,
-      desc = '[S]earch [E]xplorer',
-    },
     {
       '<leader>rr',
       function()
@@ -135,9 +153,9 @@ return {
     {
       '<leader><tab>',
       function()
-        require('snacks').picker.files()
+        require('custom.picker').files()
       end,
-      desc = '[S]nacks Find Files',
+      desc = 'Find Files',
     },
     {
       '<leader>sn',

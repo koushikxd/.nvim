@@ -5,6 +5,10 @@ return {
     'sindrets/diffview.nvim',
   },
   config = function()
-    require('resu').setup {}
+    require('resu').setup {
+      hot_reload = false,
+    }
+
+    pcall(vim.api.nvim_del_augroup_by_name, 'resu_hot_reload')
   end,
 }
