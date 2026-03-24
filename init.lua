@@ -242,11 +242,11 @@ require('lazy').setup({
       }
     end,
   },
-  --[[ {
+  {
     'nemanjamalesija/smart-paste.nvim',
     event = 'VeryLazy',
     config = true,
-  }, ]]
+  },
   {
     'numToStr/Comment.nvim',
     event = 'VeryLazy',
