@@ -26,6 +26,11 @@ M.remove_comments = function()
         if query.captures[id] == 'comment' then
           local start_row, start_col, end_row, end_col = node:range()
 
+          local parent = node:parent()
+          if parent and parent:type() == 'jsx_expression' then
+            start_row, start_col, end_row, end_col = parent:range()
+          end
+
           local is_whole_line = false
           local line_text = vim.api.nvim_buf_get_lines(bufnr, start_row, start_row + 1, false)[1]
           if line_text then

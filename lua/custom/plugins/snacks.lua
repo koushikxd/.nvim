@@ -137,6 +137,13 @@ return {
       desc = 'Search History',
     },
     {
+      '<leader>se',
+      function()
+        require('snacks').explorer()
+      end,
+      desc = '[S]earch [E]xplorer',
+    },
+    {
       '<leader>sb',
       function()
         Snacks.picker.buffers()

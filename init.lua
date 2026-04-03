@@ -9,6 +9,7 @@ vim.g.have_nerd_font = true
 vim.opt.number = true
 vim.opt.nu = true
 vim.opt.updatetime = 50
+vim.opt.ttimeoutlen = 300
 vim.opt.relativenumber = true
 vim.opt.tabstop = 2
 vim.opt.softtabstop = 2
@@ -16,7 +17,7 @@ vim.opt.shiftwidth = 2
 vim.opt.expandtab = true
 vim.opt.smartindent = true
 vim.opt.swapfile = false
-vim.opt.wrap = false
+vim.opt.wrap = true
 
 vim.opt.mouse = 'a'
 
@@ -241,11 +242,6 @@ require('lazy').setup({
         map_c_w = false,
       }
     end,
-  },
-  {
-    'nemanjamalesija/smart-paste.nvim',
-    event = 'VeryLazy',
-    config = true,
   },
   {
     'numToStr/Comment.nvim',
