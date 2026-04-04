@@ -53,6 +53,34 @@ vim.opt.scrolloff = 10
 
 vim.opt.guicursor = ''
 
+-- Some plugins in this config still call the deprecated API directly on Nvim 0.12.
+-- Bridge it to vim.iter until those plugins are updated.
+if vim.fn.has 'nvim-0.12' == 1 and vim.iter then
+  vim.tbl_flatten = function(t)
+    return vim.iter(t):flatten(math.huge):totable()
+  end
+end
+
+local legacy_packer_treesitter = vim.fn.stdpath 'data' .. '/site/pack/packer/start/nvim-treesitter'
+if vim.uv.fs_stat(legacy_packer_treesitter) then
+  pcall(function()
+    vim.opt.runtimepath:remove(legacy_packer_treesitter)
+  end)
+end
+
+local function prefer_builtin_parser(lang)
+  for _, path in ipairs(vim.api.nvim_get_runtime_file('parser/' .. lang .. '.*', true)) do
+    if path:find('/lib/nvim/parser/', 1, true) then
+      pcall(vim.treesitter.language.add, lang, { path = path })
+      break
+    end
+  end
+end
+
+for _, lang in ipairs { 'lua', 'luadoc', 'query', 'vim', 'vimdoc', 'markdown', 'markdown_inline' } do
+  prefer_builtin_parser(lang)
+end
+
 vim.diagnostic.config {
   signs = {
     priority = 9999,
@@ -329,33 +357,55 @@ require('lazy').setup({
   { 'NMAC427/guess-indent.nvim', opts = {} },
   {
     'nvim-treesitter/nvim-treesitter',
+    branch = 'main',
+    lazy = false,
     build = ':TSUpdate',
-    main = 'nvim-treesitter.configs',
+    config = function()
+      local parser_install_dir = vim.fn.stdpath 'data' .. '/site'
+      local ts = require 'nvim-treesitter'
 
-    opts = {
-      ensure_installed = {
-        'bash',
-        'c',
-        'go',
-        'javascript',
-        'html',
-        'lua',
-        'markdown',
-        'markdown_inline',
-        'vim',
-        'typescript',
-        'tsx',
-        'css',
-      },
+      ts.setup {
+        install_dir = parser_install_dir,
+      }
+      vim.opt.runtimepath:remove(parser_install_dir)
+      vim.opt.runtimepath:append(parser_install_dir)
 
-      auto_install = true,
-      highlight = {
-        enable = true,
+      vim.treesitter.language.register('bash', { 'sh', 'zsh' })
+      vim.treesitter.language.register('tsx', { 'javascriptreact', 'typescriptreact' })
 
-        additional_vim_regex_highlighting = { 'ruby' },
-      },
-      indent = { enable = true, disable = { 'ruby' } },
-    },
+      local group = vim.api.nvim_create_augroup('custom-treesitter-features', { clear = true })
+      local filetype_to_lang = {
+        bash = 'bash',
+        c = 'c',
+        css = 'css',
+        go = 'go',
+        html = 'html',
+        javascript = 'javascript',
+        javascriptreact = 'tsx',
+        lua = 'lua',
+        markdown = 'markdown',
+        sh = 'bash',
+        typescript = 'typescript',
+        typescriptreact = 'tsx',
+        vim = 'vim',
+        zsh = 'bash',
+      }
+
+      vim.api.nvim_create_autocmd('FileType', {
+        group = group,
+        pattern = vim.tbl_keys(filetype_to_lang),
+        callback = function(args)
+          local ft = vim.bo[args.buf].filetype
+          local lang = filetype_to_lang[ft]
+          if not lang then
+            return
+          end
+
+          pcall(vim.treesitter.start, args.buf, lang)
+          vim.bo[args.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+        end,
+      })
+    end,
   },
   {
     'nvim-treesitter/nvim-treesitter-textobjects',
