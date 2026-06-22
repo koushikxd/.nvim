@@ -1,6 +1,6 @@
 return {
   {
-    'williamboman/mason.nvim',
+    'mason-org/mason.nvim',
     lazy = false,
     cmd = 'Mason',
     keys = { { '<leader>cm', '<cmd>Mason<cr>', desc = 'Mason' } },
@@ -19,7 +19,7 @@ return {
   },
   {
     'WhoIsSethDaniel/mason-tool-installer.nvim',
-    dependencies = { 'williamboman/mason.nvim' },
+    dependencies = { 'mason-org/mason.nvim' },
     config = function()
       require('mason-tool-installer').setup {
         ensure_installed = {
@@ -37,8 +37,8 @@ return {
           'yamllint',
         },
         auto_update = false,
-        run_on_start = true,
-        start_delay = 3000,
+        run_on_start = false, -- run `:MasonToolsInstall` manually to install tools
+
         debounce_hours = 5,
       }
     end,

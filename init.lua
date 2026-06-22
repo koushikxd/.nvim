@@ -1,7 +1,19 @@
+vim.loader.enable()
+
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
+
+-- When inside tmux with allow-passthrough on + extended-keys on, Neovim's
+-- passthrough DCS queries (termcap/OSC52 detection) get their responses fed
+-- back as keyboard input instead of terminal responses.
+-- Fix: skip auto-detection and set these explicitly.
+-- See: https://github.com/neovim/neovim/issues/32609
+if vim.env.TMUX then
+  vim.g.termfeatures = { osc52 = false }
+  vim.opt.termguicolors = true
+end
 
 vim.g.autoformat = false
 vim.g.have_nerd_font = true
@@ -135,8 +147,12 @@ vim.keymap.set('n', '<space>x', ':.lua<CR>')
 vim.keymap.set('v', '<space>x', ':lua<CR>')
 vim.keymap.set('n', '<leader>fw', '*', { desc = 'Search for word under cursor' })
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
-vim.keymap.set('n', ']d', vim.diagnostic.goto_prev, { desc = 'Go to previous diagnostic' })
-vim.keymap.set('n', '[d', vim.diagnostic.goto_next, { desc = 'Go to next diagnostic' })
+vim.keymap.set('n', ']d', function()
+  vim.diagnostic.jump { count = -1, float = true }
+end, { desc = 'Go to previous diagnostic' })
+vim.keymap.set('n', '[d', function()
+  vim.diagnostic.jump { count = 1, float = true }
+end, { desc = 'Go to next diagnostic' })
 vim.keymap.set('n', '<leader>rc', function()
   require('utils').remove_comments()
 end, { desc = '[R]emove [C]omments' })
@@ -173,6 +189,11 @@ vim.filetype.add {
     ['%.env%.[%w_.-]+'] = 'dotenv',
   },
 }
+
+local get_option = vim.filetype.get_option
+vim.filetype.get_option = function(filetype, option)
+  return option == 'commentstring' and require('ts_context_commentstring.internal').calculate_commentstring() or get_option(filetype, option)
+end
 
 vim.api.nvim_create_autocmd('TextYankPost', {
   desc = 'Highlight when yanking (copying) text',
@@ -272,29 +293,12 @@ require('lazy').setup({
     end,
   },
   {
-    'numToStr/Comment.nvim',
-    event = 'VeryLazy',
-    dependencies = {
-      'JoosepAlviste/nvim-ts-context-commentstring',
-    },
-    config = function()
-      require('Comment').setup {
-        pre_hook = function(ctx)
-          local U = require 'Comment.utils'
-          local location = nil
-          if ctx.ctype == U.ctype.blockwise then
-            location = require('ts_context_commentstring.utils').get_cursor_location()
-          elseif ctx.cmotion == U.cmotion.v or ctx.cmotion == U.cmotion.V then
-            location = require('ts_context_commentstring.utils').get_visual_start_location()
-          end
-
-          return require('ts_context_commentstring.internal').calculate_commentstring {
-            key = ctx.ctype == U.ctype.linewise and '__default' or '__multiline',
-            location = location,
-          }
-        end,
-      }
+    'JoosepAlviste/nvim-ts-context-commentstring',
+    lazy = true,
+    init = function()
+      vim.g.skip_ts_context_commentstring_module = true
     end,
+    opts = { enable_autocmd = false },
   },
   --[[ {
     'yetone/avante.nvim',
@@ -348,6 +352,7 @@ require('lazy').setup({
 
   {
     'echasnovski/mini.nvim',
+    event = 'VeryLazy',
     config = function()
       require('mini.ai').setup { n_lines = 500 }
 
@@ -370,8 +375,42 @@ require('lazy').setup({
       vim.opt.runtimepath:remove(parser_install_dir)
       vim.opt.runtimepath:append(parser_install_dir)
 
+      local plugin_runtime = vim.fn.stdpath 'data' .. '/lazy/nvim-treesitter/runtime'
+      if vim.uv.fs_stat(plugin_runtime) then
+        vim.opt.runtimepath:append(plugin_runtime)
+      end
+
       vim.treesitter.language.register('bash', { 'sh', 'zsh' })
       vim.treesitter.language.register('tsx', { 'javascriptreact', 'typescriptreact' })
+
+      local ensure_installed = {
+        'bash',
+        'c',
+        'css',
+        'go',
+        'html',
+        'javascript',
+        'lua',
+        'markdown',
+        'markdown_inline',
+        'prisma',
+        'tsx',
+        'typescript',
+        'vim',
+      }
+      local missing = {}
+      for _, lang in ipairs(ensure_installed) do
+        if #vim.api.nvim_get_runtime_file('parser/' .. lang .. '.*', true) == 0 then
+          table.insert(missing, lang)
+        end
+      end
+      if #missing > 0 and vim.fn.executable 'tree-sitter' == 1 then
+        pcall(ts.install, missing)
+      end
+
+      vim.filetype.add {
+        extension = { prisma = 'prisma' },
+      }
 
       local group = vim.api.nvim_create_augroup('custom-treesitter-features', { clear = true })
       local filetype_to_lang = {
@@ -384,6 +423,7 @@ require('lazy').setup({
         javascriptreact = 'tsx',
         lua = 'lua',
         markdown = 'markdown',
+        prisma = 'prisma',
         sh = 'bash',
         typescript = 'typescript',
         typescriptreact = 'tsx',
