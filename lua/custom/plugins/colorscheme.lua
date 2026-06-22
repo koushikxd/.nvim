@@ -39,12 +39,33 @@ return {
           }
         end,
       }
-      vim.cmd.colorscheme 'kanagawa'
+      -- vim.cmd.colorscheme 'kanagawa'
 
       vim.api.nvim_set_hl(0, 'Normal', { bg = 'NONE' })
       vim.api.nvim_set_hl(0, 'NormalFloat', { bg = 'NONE' })
       vim.api.nvim_set_hl(0, 'SignColumn', { bg = 'NONE' })
       vim.api.nvim_set_hl(0, 'FloatBorder', { bg = 'NONE' })
+    end,
+  },
+  {
+    'tiesen243/vercel.nvim',
+    lazy = false,
+    priority = 1000,
+    config = function()
+      require('vercel').setup {
+        theme = 'dark',
+        transparent = false,
+        italics = {
+          comments = true,
+          keywords = true,
+          functions = true,
+          strings = true,
+          variables = true,
+          bufferline = false,
+        },
+        overrides = {},
+      }
+      vim.cmd.colorscheme 'vercel'
     end,
   },
   {
@@ -114,7 +135,7 @@ return {
     name = 'ashen',
     priority = 1000,
     config = function()
-      -- vim.cmd.colorscheme 'ashen'
+      --vim.cmd.colorscheme 'ashen'
     end,
   },
   {
