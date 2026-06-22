@@ -2,8 +2,8 @@ return {
   'neovim/nvim-lspconfig',
   event = { 'BufReadPre', 'BufNewFile' },
   dependencies = {
-    { 'williamboman/mason.nvim' },
-    'williamboman/mason-lspconfig.nvim',
+    { 'mason-org/mason.nvim' },
+    'mason-org/mason-lspconfig.nvim',
     { 'b0o/schemastore.nvim' },
     { 'folke/lazydev.nvim', ft = 'lua', opts = { library = { { path = '${3rd}/luv/library', words = { 'vim%.uv' } } } } },
   },
@@ -17,7 +17,7 @@ return {
       'cssls',
       'html',
       'tailwindcss',
-      'ts_ls',
+      'vtsls',
       'jsonls',
       'yamlls',
       'marksman',
@@ -60,10 +60,16 @@ return {
       },
     })
 
-    vim.lsp.config('ts_ls', {
+    vim.lsp.config('vtsls', {
       single_file_support = true,
       settings = {
         javascript = {
+          suggest = {
+            names = false,
+            autoImports = false,
+          },
+        },
+        typescript = {
           suggest = {
             names = false,
             autoImports = false,
@@ -85,7 +91,7 @@ return {
 
     require('mason-lspconfig').setup {
       ensure_installed = servers,
-      automatic_enable = true,
+      automatic_enable = false,
     }
 
     vim.api.nvim_create_autocmd('LspAttach', {
