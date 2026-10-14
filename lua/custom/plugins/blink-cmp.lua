@@ -5,6 +5,7 @@ return {
       'rafamadriz/friendly-snippets',
     },
     version = '*',
+    event = 'InsertEnter',
     opts = {
       keymap = {
         preset = 'default',
@@ -52,7 +53,8 @@ return {
         },
       },
       sources = {
-        default = { 'lsp', 'path', 'snippets', 'buffer', 'lazydev' },
+        default = { 'lsp', 'path', 'snippets', 'buffer' },
+        per_filetype = { lua = { inherit_defaults = true, 'lazydev' } },
         providers = {
           lazydev = { module = 'lazydev.integrations.blink', score_offset = 100 },
         },

@@ -35,7 +35,7 @@ return {
           if vim.wo.diff then
             vim.cmd.normal { '[c', bang = true }
           else
-            gs.next_hunk()
+            gs.nav_hunk 'next'
           end
         end, { desc = 'Jump to next git [c]hange' })
 
@@ -43,7 +43,7 @@ return {
           if vim.wo.diff then
             vim.cmd.normal { ']c', bang = true }
           else
-            gs.prev_hunk()
+            gs.nav_hunk 'prev'
           end
         end, { desc = 'Jump to previous git [c]hange' })
 
@@ -51,7 +51,7 @@ return {
         map('n', '<leader>gR', gs.reset_buffer, { desc = 'git [R]eset buffer' })
         map('n', '<leader>gb', gs.blame_line, { desc = 'git [b]lame line' })
         map('n', '<leader>tb', gs.toggle_current_line_blame, { desc = '[T]oggle git show [b]lame line' })
-        map('n', '<leader>tD', gs.toggle_deleted, { desc = '[T]oggle git show [D]eleted' })
+        map('n', '<leader>tD', gs.preview_hunk_inline, { desc = '[T]oggle git show [D]eleted' })
       end,
     },
   },

@@ -26,7 +26,6 @@ return {
     },
     formatters_by_ft = {
       lua = { 'stylua' },
-      go = { 'goimports', 'gofmt' },
 
       javascript = { 'biome', 'prettier' },
       typescript = { 'biome', 'prettier' },
@@ -40,10 +39,9 @@ return {
       yaml = { 'prettier' },
       markdown = { 'prettier', 'injected' },
 
-      python = { 'isort', 'black' },
+      python = { 'ruff_organize_imports', 'ruff_format' },
       sh = { 'shfmt' },
       bash = { 'shfmt' },
-      proto = { 'buf' },
       toml = { 'taplo' },
     },
     formatters = {

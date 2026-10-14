@@ -20,7 +20,7 @@ vim.g.have_nerd_font = true
 
 vim.opt.number = true
 vim.opt.nu = true
-vim.opt.updatetime = 50
+vim.opt.updatetime = 250
 vim.opt.ttimeoutlen = 300
 vim.opt.relativenumber = true
 vim.opt.tabstop = 2
@@ -64,34 +64,6 @@ vim.opt.cursorline = true
 vim.opt.scrolloff = 10
 
 vim.opt.guicursor = ''
-
--- Some plugins in this config still call the deprecated API directly on Nvim 0.12.
--- Bridge it to vim.iter until those plugins are updated.
-if vim.fn.has 'nvim-0.12' == 1 and vim.iter then
-  vim.tbl_flatten = function(t)
-    return vim.iter(t):flatten(math.huge):totable()
-  end
-end
-
-local legacy_packer_treesitter = vim.fn.stdpath 'data' .. '/site/pack/packer/start/nvim-treesitter'
-if vim.uv.fs_stat(legacy_packer_treesitter) then
-  pcall(function()
-    vim.opt.runtimepath:remove(legacy_packer_treesitter)
-  end)
-end
-
-local function prefer_builtin_parser(lang)
-  for _, path in ipairs(vim.api.nvim_get_runtime_file('parser/' .. lang .. '.*', true)) do
-    if path:find('/lib/nvim/parser/', 1, true) then
-      pcall(vim.treesitter.language.add, lang, { path = path })
-      break
-    end
-  end
-end
-
-for _, lang in ipairs { 'lua', 'luadoc', 'query', 'vim', 'vimdoc', 'markdown', 'markdown_inline' } do
-  prefer_builtin_parser(lang)
-end
 
 vim.diagnostic.config {
   signs = {
@@ -163,6 +135,11 @@ vim.keymap.set('v', '<leader>ay', function()
 end, { desc = '[A]bsolute path [Y]ank with selection' })
 
 vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
+
+vim.keymap.set('n', '<leader>u', function()
+  vim.cmd.packadd 'nvim.undotree'
+  vim.cmd.Undotree()
+end, { desc = 'Toggle Undotree' })
 
 vim.keymap.set('v', 'J', ":m '>+1<CR>gv=gv")
 vim.keymap.set('v', 'K', ":m '<-2<CR>gv=gv")
@@ -248,32 +225,6 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require('lazy').setup({
-  'tpope/vim-sleuth',
-  'ThePrimeagen/vim-be-good',
-  'vuciv/golf',
-  {
-    'enochchau/nvim-pretty-ts-errors',
-    build = 'npm install',
-    ft = { 'typescript', 'typescriptreact', 'javascript', 'javascriptreact' },
-    keys = {
-      {
-        '<C-w>d',
-        function()
-          require('nvim-pretty-ts-errors').show_line_diagnostics()
-        end,
-        desc = 'Show TS Diagnostics',
-      },
-    },
-  },
-  {
-    'karb94/neoscroll.nvim',
-    config = function()
-      require('neoscroll').setup {
-        duration_multiplier = 0,
-        mappings = { '<C-u>', '<C-d>' },
-      }
-    end,
-  },
   {
     'windwp/nvim-autopairs',
     event = 'InsertEnter',
@@ -300,58 +251,8 @@ require('lazy').setup({
     end,
     opts = { enable_autocmd = false },
   },
-  --[[ {
-    'yetone/avante.nvim',
-    event = 'VeryLazy',
-    lazy = false,
-    version = false,
-    opts = {},
-
-    build = 'make',
-
-    dependencies = {
-      'nvim-treesitter/nvim-treesitter',
-      'stevearc/dressing.nvim',
-      'nvim-lua/plenary.nvim',
-      'MunifTanjim/nui.nvim',
-
-      'nvim-tree/nvim-web-devicons',
-      'zbirenbaum/copilot.lua',
-      {
-
-        'HakonHarnes/img-clip.nvim',
-        event = 'VeryLazy',
-        opts = {
-
-          default = {
-            embed_image_as_base64 = false,
-            prompt_for_file_name = false,
-            drag_and_drop = {
-              insert_mode = true,
-            },
-
-            use_absolute_path = true,
-          },
-        },
-      },
-      {
-
-        'MeanderingProgrammer/render-markdown.nvim',
-        dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' },
-        opts = {
-          file_types = { 'markdown', 'Avante' },
-        },
-        ft = { 'markdown', 'Avante' },
-      },
-    },
-  },
-]]
-  { 'tzachar/highlight-undo.nvim' },
-
-  { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
-
   {
-    'echasnovski/mini.nvim',
+    'nvim-mini/mini.nvim',
     event = 'VeryLazy',
     config = function()
       require('mini.ai').setup { n_lines = 500 }
@@ -366,83 +267,55 @@ require('lazy').setup({
     lazy = false,
     build = ':TSUpdate',
     config = function()
-      local parser_install_dir = vim.fn.stdpath 'data' .. '/site'
-      local ts = require 'nvim-treesitter'
-
-      ts.setup {
-        install_dir = parser_install_dir,
-      }
-      vim.opt.runtimepath:remove(parser_install_dir)
-      vim.opt.runtimepath:append(parser_install_dir)
-
-      local plugin_runtime = vim.fn.stdpath 'data' .. '/lazy/nvim-treesitter/runtime'
-      if vim.uv.fs_stat(plugin_runtime) then
-        vim.opt.runtimepath:append(plugin_runtime)
-      end
-
-      vim.treesitter.language.register('bash', { 'sh', 'zsh' })
-      vim.treesitter.language.register('tsx', { 'javascriptreact', 'typescriptreact' })
-
-      local ensure_installed = {
-        'bash',
-        'c',
-        'css',
-        'go',
-        'html',
+      local filetypes = {
         'javascript',
+        'javascriptreact',
+        'typescript',
+        'typescriptreact',
+        'python',
+        'rust',
         'lua',
+        'css',
+        'html',
+        'json',
+        'jsonc',
+        'markdown',
+        'sh',
+        'zsh',
+        'toml',
+        'yaml',
+        'prisma',
+      }
+      require('nvim-treesitter').install {
+        'lua',
+        'vim',
+        'vimdoc',
+        'query',
         'markdown',
         'markdown_inline',
-        'prisma',
-        'tsx',
+        'javascript',
         'typescript',
-        'vim',
-      }
-      local missing = {}
-      for _, lang in ipairs(ensure_installed) do
-        if #vim.api.nvim_get_runtime_file('parser/' .. lang .. '.*', true) == 0 then
-          table.insert(missing, lang)
-        end
-      end
-      if #missing > 0 and vim.fn.executable 'tree-sitter' == 1 then
-        pcall(ts.install, missing)
-      end
-
-      vim.filetype.add {
-        extension = { prisma = 'prisma' },
+        'tsx',
+        'python',
+        'rust',
+        'css',
+        'html',
+        'json',
+        'bash',
+        'toml',
+        'yaml',
+        'prisma',
       }
 
-      local group = vim.api.nvim_create_augroup('custom-treesitter-features', { clear = true })
-      local filetype_to_lang = {
-        bash = 'bash',
-        c = 'c',
-        css = 'css',
-        go = 'go',
-        html = 'html',
-        javascript = 'javascript',
-        javascriptreact = 'tsx',
-        lua = 'lua',
-        markdown = 'markdown',
-        prisma = 'prisma',
-        sh = 'bash',
-        typescript = 'typescript',
-        typescriptreact = 'tsx',
-        vim = 'vim',
-        zsh = 'bash',
-      }
+      vim.treesitter.language.register('bash', 'zsh')
 
       vim.api.nvim_create_autocmd('FileType', {
-        group = group,
-        pattern = vim.tbl_keys(filetype_to_lang),
+        group = vim.api.nvim_create_augroup('custom-treesitter-features', { clear = true }),
+        pattern = filetypes,
         callback = function(args)
-          local ft = vim.bo[args.buf].filetype
-          local lang = filetype_to_lang[ft]
-          if not lang then
-            return
+          if pcall(vim.treesitter.start, args.buf) then
+            vim.bo[args.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
           end
-
-          pcall(vim.treesitter.start, args.buf, lang)
-          vim.bo[args.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
         end,
       })
     end,
@@ -497,6 +370,13 @@ require('lazy').setup({
   { import = 'default.plugins' },
   { import = 'custom.plugins' },
 }, {
+  rocks = { enabled = false },
+  install = { colorscheme = { 'vercel' } },
+  performance = {
+    rtp = {
+      disabled_plugins = { 'gzip', 'netrwPlugin', 'tarPlugin', 'tohtml', 'tutor', 'zipPlugin' },
+    },
+  },
   ui = {
     icons = vim.g.have_nerd_font and {} or {
       cmd = '⌘',

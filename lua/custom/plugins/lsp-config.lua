@@ -1,6 +1,19 @@
 return {
   'neovim/nvim-lspconfig',
-  event = { 'BufReadPre', 'BufNewFile' },
+  ft = {
+    'javascript',
+    'javascriptreact',
+    'typescript',
+    'typescriptreact',
+    'python',
+    'rust',
+    'lua',
+    'css',
+    'scss',
+    'html',
+    'json',
+    'jsonc',
+  },
   dependencies = {
     { 'mason-org/mason.nvim' },
     'mason-org/mason-lspconfig.nvim',
@@ -9,18 +22,14 @@ return {
   },
   config = function()
     local servers = {
-      'bashls',
-      'clangd',
-      'gopls',
       'lua_ls',
       'pyright',
+      'rust_analyzer',
       'cssls',
       'html',
       'tailwindcss',
       'vtsls',
       'jsonls',
-      'yamlls',
-      'marksman',
       'biome',
     }
 
@@ -61,7 +70,6 @@ return {
     })
 
     vim.lsp.config('vtsls', {
-      single_file_support = true,
       settings = {
         javascript = {
           suggest = {

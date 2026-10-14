@@ -1,8 +1,8 @@
 return {
   'tpope/vim-fugitive',
+  cmd = { 'Git', 'G', 'Gdiffsplit', 'Gvdiffsplit', 'Gread', 'Gwrite', 'GBrowse' },
+  keys = { { '<leader>g-', '<cmd>Git<cr>' } },
   config = function()
-    vim.keymap.set('n', '<leader>g-', vim.cmd.Git)
-
     local BlitZ_Fugitive = vim.api.nvim_create_augroup('BlitZ_Fugitive', {})
     local BlitZ_Diff = vim.api.nvim_create_augroup('BlitZ_Diff', {})
 
